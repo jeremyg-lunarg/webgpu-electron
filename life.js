@@ -3,9 +3,16 @@ const LifeShaders = `
 @group(0) @binding(0) var<uniform> grid: vec2f;
 
 @vertex
-fn vertexMain(@location(0) pos: vec2f) ->
+fn vertexMain(@location(0) pos: vec2f, @builtin(instance_index) instance: u32) ->
   @builtin(position) vec4f {
-  return vec4f(pos / grid, 0, 1);
+  let i = f32(instance);
+  // Compute the cell coordinate from the instance_index
+  let cell = vec2f(i % grid.x, floor(i / grid.x));
+
+  let cellOffset = cell / grid * 2;
+  let gridPos = (pos + 1) / grid - 1 + cellOffset;
+
+  return vec4f(gridPos, 0, 1);
 }
 
 @fragment
@@ -73,7 +80,7 @@ fn fragmentMain() -> @location(0) vec4f {
             }]
         }
     });
-    const GRID_SIZE = 4;
+    const GRID_SIZE = 16;
     // Create a uniform buffer that describes the grid.
     const uniformArray = new Float32Array([GRID_SIZE, GRID_SIZE]);
     const uniformBuffer = device.createBuffer({
@@ -104,7 +111,7 @@ fn fragmentMain() -> @location(0) vec4f {
     pass.setPipeline(cellPipeline);
     pass.setVertexBuffer(0, vertexBuffer);
     pass.setBindGroup(0, bindGroup); // New line!
-    pass.draw(vertices.length / 2); // 6 vertices
+    pass.draw(vertices.length / 2, GRID_SIZE * GRID_SIZE);
 
     pass.end();
     const commandBuffer = encoder.finish();

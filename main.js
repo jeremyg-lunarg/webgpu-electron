@@ -5,8 +5,8 @@ app.commandLine.appendSwitch("enable-unsafe-webgpu")
 app.commandLine.appendSwitch("enable-webgpu-developer-features")
 const createWindow = () => {
   const win = new BrowserWindow({
-    width: 580,
-    height: 530
+    height: 560,
+    width: 540,
   });
   win.webContents.openDevTools()
   win.loadFile('index.html')
