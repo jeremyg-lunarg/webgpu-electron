@@ -9,7 +9,7 @@ const createWindow = () => {
     width: 540,
   });
   win.webContents.openDevTools()
-  win.loadFile('index.html')
+  win.loadFile('life.html')
 }
 
 app.whenReady().then(() => {
