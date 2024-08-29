@@ -1,25 +1,41 @@
 {
 const LifeShaders = `
+struct VertexInput {
+  @location(0) pos: vec2f,
+  @builtin(instance_index) instance: u32,
+};
+
+struct VertexOutput {
+  @builtin(position) pos: vec4f,
+  @location(0) cell: vec2f,
+};
+
 @group(0) @binding(0) var<uniform> grid: vec2f;
 
 @vertex
-fn vertexMain(@location(0) pos: vec2f, @builtin(instance_index) instance: u32) ->
-  @builtin(position) vec4f {
-  let i = f32(instance);
-  // Compute the cell coordinate from the instance_index
+fn vertexMain(input: VertexInput) -> VertexOutput  {
+  let i = f32(input.instance);
   let cell = vec2f(i % grid.x, floor(i / grid.x));
-
   let cellOffset = cell / grid * 2;
-  let gridPos = (pos + 1) / grid - 1 + cellOffset;
+  let gridPos = (input.pos + 1) / grid - 1 + cellOffset;
 
-  return vec4f(gridPos, 0, 1);
+  var output: VertexOutput;
+  output.pos = vec4f(gridPos, 0, 1);
+  output.cell = cell;
+  return output;
 }
+
+struct FragInput {
+  @location(0) cell: vec2f,
+};
 
 @fragment
-fn fragmentMain() -> @location(0) vec4f {
-  return vec4f(1, 0, 0, 1); // (Red, Green, Blue, Alpha)
+fn fragmentMain(input: FragInput) -> @location(0) vec4f {
+  let c = input.cell / grid;
+  return vec4f(c, 1-c.x, 1);
 }
 `;
+    const GRID_SIZE = 64;
     const canvas = document.querySelector("canvas");
     if (!navigator.gpu) {
         throw new Error("WebGPU not supported on this browser.");
@@ -80,7 +96,6 @@ fn fragmentMain() -> @location(0) vec4f {
             }]
         }
     });
-    const GRID_SIZE = 16;
     // Create a uniform buffer that describes the grid.
     const uniformArray = new Float32Array([GRID_SIZE, GRID_SIZE]);
     const uniformBuffer = device.createBuffer({
