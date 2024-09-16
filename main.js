@@ -8,7 +8,7 @@ const createWindow = () => {
       fullscreen: true,
   });
   win.webContents.openDevTools()
-  win.loadFile('triangle.html')
+  win.loadFile('life.html')
 }
 
 app.whenReady().then(() => {
