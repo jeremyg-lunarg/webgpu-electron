@@ -5,10 +5,10 @@ app.commandLine.appendSwitch("enable-unsafe-webgpu")
 app.commandLine.appendSwitch("enable-webgpu-developer-features")
 const createWindow = () => {
   const win = new BrowserWindow({
-      fullscreen: true,
+      fullscreen: false,
   });
-  win.webContents.openDevTools()
-  win.loadFile('triangle.html')
+  //win.webContents.openDevTools()
+  win.loadFile('metaballs.html')
 }
 
 app.whenReady().then(() => {
