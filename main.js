@@ -2,37 +2,28 @@ const { app, BrowserWindow, crashReporter } = require('electron/main')
 const parseArgs = require('electron-args');
 
 const cli = parseArgs(`
-	sample-viewer
+webgpu-electron
 
-	Usage
-	  $ sample-viewer [path]
+Usage
+  $ webgpu-electron [options] [sample-name]
 
-	Options
-	  --help     show help
-	  --fullscreen start fullscreen
-          --devtools   open devtools
-	  --auto     slide show [Default: false]
-
-	Examples
-	  $ sample-viewer . --auto
-	  $ sample-viewer ~/Pictures/
+Options
+  --help     show help
+  --fullscreen start fullscreen
+  --devtools   open devtools
 `, {
 	alias: {
 		h: 'help',
 		f: 'fullscreen',
 		d: 'devtools',
-		a: 'app',
 	},
 	default: {
 		fullscreen: false,
 		devtools: false,
-		app: 'triangle',
 	}
 });
 
-console.log(cli.flags);
-console.log(cli.input[0]);
-
+const sample_name = cli.input[0] ? cli.input[0] : 'triangle';
 
 crashReporter.start({uploadToServer: false})
 app.commandLine.appendSwitch("enable-features", "Vulkan")
@@ -45,7 +36,7 @@ const createWindow = () => {
   if (cli.flags['devtools']) {
     win.webContents.openDevTools()
   }
-  win.loadFile(cli.flags['app'] + '.html')
+  win.loadFile(sample_name + '/index.html')
 }
 
 app.whenReady().then(() => {
